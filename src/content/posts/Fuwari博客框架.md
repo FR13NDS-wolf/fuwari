@@ -3,175 +3,100 @@ title: Fuwari博客框架
 published: 2025-07-27
 description: '迁移到fuwari模版'
 image: 'https://teleimg.loophy.top/file/1753550039113_20250727011352275.png'
-tags: [Blog]
+tags: [Blog, Cloudflare, Fuwari]
 category: '记录'
 draft: false 
 lang: ''
 ---
 
-# An h1 header
+## 流程图
 
-Paragraphs are separated by a blank line.
+本地部署Fuwari，编写文章 -> 推送更改到远程Github仓库 -> Cloudflare Pages检测到仓库更新自动构建新的网站静态文件 -> 网站成功更改
 
-2nd paragraph. _Italic_, **bold**, and `monospace`. Itemized lists
-look like:
+## Let's go
 
-- this one
-- that one
-- the other one
+1. Fork仓库: https://github.com/saicaca/fuwari
+2. 克隆到本地: `git clone <git@github.com:yourname/fuwari.git>`
 
-Note that --- not considering the asterisk --- the actual text
-content starts at 4-columns in.
+* 需要自己配置好GitHub SSH密钥
 
-> Block quotes are
-> written like so.
->
-> They can span multiple paragraphs,
-> if you like.
+3. 全局安装pnpm: `sudo npm install -g pnpm`
+4. 项目根目录安装依赖：`pnpm install` 和 `pnpm add sharp`
+5. 成功在本地部署了Fuwari
 
-Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
-in chapters 12--14"). Three dots ... will be converted to an ellipsis.
-Unicode is supported. ☺
+## 主要配置
 
-## An h2 header
+在根目录下的 `src` 文件夹中，你可以找到 `config.ts` 我们来开始改写
 
-Here's a numbered list:
+- title：你的博客主标题
+- subtitle：你的博客副标题。可选，在首页会显示为“主标题 - 副标题”
+- lang：博客显示语言。注释已经列出了一些常用的值，如：en, zh_CN, zh_TW, ja, ko
+- themeColor：hue值则是你的博客主题色，可以在你的博客右上角的画板图标确定喜欢的颜色再填写
+- banner：src：即banner图片，支持http/https URL
+- favicon：src：即网站图标，支持http/https URL
+- links：即友情链接，这些链接在导航栏上
+- avatar：即你的头像
+- name：即你的名字
+- bio：即个性签名，会显示在头像和名字下面
+- `NavBarConfig` 为导航栏设置的超链接
+- `ProfileConfig` 为你的用户的超链接
+- icon：你需要前往[icones.js](https://icones.js.org/)去搜索你想要的图标
 
-1. first item
-2. second item
-3. third item
+`src/content/posts` 下存在一些示例文章,可以直接删除
 
-Note again how the actual text starts at 4 columns in (4 characters
-from the left side). Here's a code sample:
+`src/content/spec/about.md` 是博客的个人主页需要修改一下
 
-    # Let me re-iterate ...
-    for i in 1 .. 10 { do-something(i) }
+根目录下的 `astro.config.mjs` 配置一下自己的站点链接
 
-As you probably guessed, indented 4 spaces. By the way, instead of
-indenting the block, you can use delimited blocks, if you like:
+## 开始写作
+
+1. 首先，在项目根目录执行：`pnpm new-post <这里填写你的文章标题>` 
+2. 然后，在根目录下的 `src/content/posts` 文件夹中会多出一个 `xxx.md`文件
+3. 我们打开这个文件，你可以看到一些基本信息，我们只需要关注几个重要的信息
 
 ```
-define foobar() {
-    print "Welcome to flavor country!";
-}
+title: Fuwari博客框架
+published: 2025-07-27
+description: '迁移到fuwari模版'
+image: 'https://teleimg.loophy.top/file/1753550039113_20250727011352275.png'
+tags: [Blog, Cloudflare, Fuwari]
+category: '记录'
+draft: false 
+lang: 'zh_CN'
 ```
 
-(which makes copying & pasting easier). You can optionally mark the
-delimited block for Pandoc to syntax highlight it:
+- title：文章标题
+- published：文章创建时间
+- description：文章描述，正常会显示在文章标题下面
+- image：文章封面图 (同目录需要写 `./` )
+- tag：文章标签
+- categories：文章分类
+- Lang：与网站语言不同是需要修改
 
-```python
-import time
-# Quick, count to ten!
-for i in range(10):
-    # (but not *too* quick)
-    time.sleep(0.5)
-    print i
-```
+4. 至此我们就可以编写MarkDown语法的博文了
 
-### An h3 header
+## 本地预览并推送到仓库
 
-Now a nested list:
+根目录执行：`pnpm dev`
 
-1. First, get these ingredients:
+![image-20250727下午10025124](https://teleimg.loophy.top/file/1753592460041_image-20250727下午10025124.png)
 
-   - carrots
-   - celery
-   - lentils
+推送到GitHub仓库
 
-2. Boil some water.
+若是配置好SSH密钥可以直接commit推送
 
-3. Dump everything in the pot and follow
-   this algorithm:
+* 首先，让我们提交所有文件：`git add .`
 
-       find wooden spoon
-       uncover pot
-       stir
-       cover pot
-       balance wooden spoon precariously on pot handle
-       wait 10 minutes
-       goto first step (or shut off burner when done)
+- 然后，让我们发布一个本地提交：`git commit -m "Init"`
+- 最后，让我们将本地更改提交到远程仓库：`git push`
 
-   Do not bump wooden spoon or it will fall.
+## Cloudflare Pages部署
 
-Notice again how text always lines up on 4-space indents (including
-that last line which continues item 3 above).
+构建命令：`pnpm build` ，然后设置构建输出目录：`dist`
 
-Here's a link to [a website](http://foo.bar), to a [local
-doc](local-doc.html), and to a [section heading in the current
-doc](#an-h2-header). Here's a footnote [^1].
+![image-20250727下午10653094](https://teleimg.loophy.top/file/1753592819740_image-20250727下午10653094.png)
 
-[^1]: Footnote text goes here.
+绑定自定义域，访问自定义域即可访问你的博客！
 
-Tables can look like this:
+随后，你只需要在本地编写文章，然后使用Git将更改推送到远程仓库，Cloudflare就会自动部署，更新你的博客！
 
-size material color
-
----
-
-9 leather brown
-10 hemp canvas natural
-11 glass transparent
-
-Table: Shoes, their sizes, and what they're made of
-
-(The above is the caption for the table.) Pandoc also supports
-multi-line tables:
-
----
-
-keyword text
-
----
-
-red Sunsets, apples, and
-other red or reddish
-things.
-
-green Leaves, grass, frogs
-and other things it's
-not easy being.
-
----
-
-A horizontal rule follows.
-
----
-
-Here's a definition list:
-
-apples
-: Good for making applesauce.
-oranges
-: Citrus!
-tomatoes
-: There's no "e" in tomatoe.
-
-Again, text is indented 4 spaces. (Put a blank line between each
-term/definition pair to spread things out more.)
-
-Here's a "line block":
-
-| Line one
-| Line too
-| Line tree
-
-and images can be specified like so:
-
-[//]: # (![example image]&#40;./demo-banner.png "An exemplary image"&#41;)
-
-Inline math equations go in like so: $\omega = d\phi / dt$. Display
-math should get its own line and be put in in double-dollarsigns:
-
-$$I = \int \rho R^{2} dV$$
-
-$$
-\begin{equation*}
-\pi
-=3.1415926535
- \;8979323846\;2643383279\;5028841971\;6939937510\;5820974944
- \;5923078164\;0628620899\;8628034825\;3421170679\;\ldots
-\end{equation*}
-$$
-
-And note that you can backslash-escape any punctuation characters
-which you wish to be displayed literally, ex.: \`foo\`, \*bar\*, etc.
